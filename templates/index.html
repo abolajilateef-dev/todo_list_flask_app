@@ -5,69 +5,57 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            max-width: 600px;
-            margin: 50px auto;
-            padding: 20px;
+            width: 500px;
+            margin: 40px auto;
         }
-        h1 {
-            text-align: center;
-        }
-        form {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
+
         input[type="text"] {
-            flex: 1;
-            padding: 10px;
-            font-size: 16px;
+            padding: 8px;
+            width: 300px;
         }
+
         button {
-            padding: 10px 20px;
-            font-size: 16px;
-            cursor: pointer;
+            padding: 8px 16px;
         }
+
         .task {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
             padding: 10px;
-            border: 1px solid #ddd;
-            margin-bottom: 5px;
+            border-bottom: 1px solid #ccc;
         }
-        .task.completed {
+
+        .task.completed span {
             text-decoration: line-through;
             color: gray;
         }
-        .actions a {
-            margin-left: 10px;
+
+        .task a {
+            margin-left: 15px;
             text-decoration: none;
         }
     </style>
 </head>
 <body>
-    <h1>TODO APP</h1>
-    
+    <h1>Tasks</h1>
+
     <form method="POST" action="/add">
-        <input type="text" name="task" placeholder="Enter a task" required>
+        <input type="text" name="task" placeholder="New task" required>
         <button type="submit">Add</button>
     </form>
+
+    <br>
 
     {% if tasks %}
         {% for task in tasks %}
             <div class="task {% if task.completed %}completed{% endif %}">
                 <span>{{ task.text }}</span>
-                <div class="actions">
-                    {% if not task.completed %}
-                        <a href="/complete/{{ loop.index0 }}">✓</a>
-                    {% endif %}
-                    <a href="/delete/{{ loop.index0 }}">✕</a>
-                </div>
+                {% if not task.completed %}
+                    <a href="/complete/{{ loop.index0 }}">Done</a>
+                {% endif %}
+                <a href="/delete/{{ loop.index0 }}">Delete</a>
             </div>
         {% endfor %}
     {% else %}
-        <p>No tasks yet!</p>
+        <p>No tasks yet.</p>
     {% endif %}
-
 </body>
 </html>
