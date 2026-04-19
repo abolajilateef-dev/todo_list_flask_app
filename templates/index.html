@@ -36,26 +36,62 @@
 </head>
 <body>
     <h1>Tasks</h1>
+    <input type="text", id="taskInput", placeholder="Add task">
+    <button onclick="addTask()">Add</button>
+    <br><br>
+    <div id="taskList"></div>
+   
+    <script>
+        async function load_task() {
+            const res = await fetch('/')
+            const tasks = await res.json()
+            const taskList = document.getElementById("taskList")
+            
+            if (tasks.length == 0) {
+                taskList.innerHTML = '<p>No tasks yet</p>'
+                return
+            }
 
-    <form method="POST" action="/add">
-        <input type="text" name="task" placeholder="New task" required>
-        <button type="submit">Add</button>
-    </form>
-
-    <br>
-
-    {% if tasks %}
-        {% for task in tasks %}
-            <div class="task {% if task.completed %}completed{% endif %}">
-                <span>{{ task.text }}</span>
-                {% if not task.completed %}
-                    <a href="/complete/{{ loop.index0 }}">Done</a>
-                {% endif %}
-                <a href="/delete/{{ loop.index0 }}">Delete</a>
+            taskList.innerHTML = tasks.map((task,index) => `
+            <div class = "task ${task.completed ? 'completed' : ''}">
+                <span>${task.text}</span>
+            ${!task.completed ? `<button onclick="completeTask(${index})">Done</button>` : ''}
+                <button onclick="deleteTask(${index})">Delete</button>
             </div>
-        {% endfor %}
-    {% else %}
-        <p>No tasks yet.</p>
-    {% endif %}
+            `).join('')
+        }
+
+        async function addTask() {
+            const input = document.getElementById("taskInput")
+            const text = input.value.trim()
+            if (!text) return
+
+            await fetch('/add', {
+                method :'POST',
+                headers : {'Content-Type': 'application/json'},
+                body: JSON.stringify({ text: text })
+            })
+
+            input.value = ''
+            load_task()
+        }
+
+        async function completeTask(index) {
+            await fetch(`/complete/${index}`, {
+                method : 'PATCH'
+            })
+            load_task()
+        }
+
+        async function deleteTask(index) {
+            await fetch(`/delete/${index}`, {
+                method : 'DELETE'
+            })
+            load_task()
+        }
+
+
+        load_task()
+    </script>
 </body>
 </html>

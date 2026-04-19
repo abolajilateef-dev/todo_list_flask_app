@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 import json
 
 app = Flask(__name__)
@@ -13,6 +13,10 @@ def load_tasks():
 def save_tasks(tasks):
     with open('tasks.json', 'w') as f:
         json.dump(tasks, f)
+
+@app.route('/home')
+def home():
+    return send_from_directory('templates', 'index.html')
 
 @app.route('/', methods=['GET'])
 def get_task():
